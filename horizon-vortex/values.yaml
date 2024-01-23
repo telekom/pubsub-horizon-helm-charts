@@ -1,0 +1,94 @@
+# -- Deployment Configuration --
+
+# -- Image configuration for "vortex" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+image:
+  repository: example.devops.company.de
+  organization: internal/example/horizon
+  name: vortex
+  tag: develop
+  pullPolicy: IfNotPresent
+
+# -- Deployment replicas: Sets the number of replicas for the deployment.
+replicas: 1
+
+common:
+  # -- Image pull secrets: Defines image pull secrets for different clusters.
+  imagePullSecrets: []
+  cluster: cluster
+  team: horizon-pubsub
+  product: horizon
+  subProduct: vortex
+  metadata:
+    environment: default
+  domain: example.domain.com
+
+# -- Logging: Sets the log level for general logging.
+logLevel: INFO
+
+# -- Kafka: Configuration for connecting to Kafka brokers and managing topics.
+kafka:
+  broker: kafka:9092
+  groupname: vortex
+  topics:
+    - subscribed
+    - subscribed_5d
+    - subscribed_3d
+    - subscribed_1d
+    - subscribed_1h
+  sessionTimeoutSec: 40
+
+# -- Affinity: Configures settings related to affinity.
+affinity:
+  enabled: true
+
+# -- MongoDB: Configuration for connecting to MongoDB database and managing collection, bulkSize and flushIntervalSec.
+mongo:
+  url: mongodbUrl
+  database: horizon
+  collection: status
+  bulkSize: 500
+  flushIntervalSec: 30
+
+# -- Metrics: Vortex metrics configuration.
+metrics:
+  enabled: false
+  port: 8080
+  release: release
+
+# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- PodSecurityContext: Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1001
+  supplementalGroups: [1001]
+
+# -- ContainerSecurityContext: Security context set for the container.
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  capabilities:
+    drop:
+    - ALL
+
+# -- Resources: Resource limits and requests.
+resources:
+  limits:
+    cpu: 1
+    memory: 500Mi
+  requests:
+    cpu: 50m
+    memory: 200Mi

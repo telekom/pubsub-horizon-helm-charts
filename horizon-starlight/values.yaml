@@ -1,0 +1,155 @@
+# -- Deployment Configuration --
+
+# -- Image configuration for "starlight" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+image:
+  repository: example.devops.company.de
+  organization: internal/example/horizon
+  name: starlight
+  tag: develop
+  pullPolicy: IfNotPresent
+
+# -- Deployment replicas: Sets the number of replicas for the deployment.
+replicas: 1
+
+common:
+  # -- ImagePullSecrets: Defines image pull secrets for different clusters.
+  imagePullSecrets: []
+  cluster: cluster
+  team: horizon-pubsub
+  product: horizon
+  subProduct: starlight
+  metadata:
+    environment: default
+  domain: example.domain.com
+
+commonHorizon:
+  # -- IssuerUrl: Sets the issuerUrl.
+  issuerUrl: issuerUrl
+
+  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, groupId, linger time, acknowledgment settings, and compression options.
+  kafka:
+    brokers: kafka:9092
+    groupId: starlight
+    lingerMs: 5
+    acks: 1
+    compression:
+      enabled: true
+      type: snappy
+
+  # -- Informer: Specifies namespace for the informer.
+  informer:
+    namespace: default
+
+  # -- Environment: Sets the default environment.
+  defaultEnvironment: default
+
+  # -- Publishing timeout: Sets the timeout duration (in milliseconds) for the publishing process.
+  publishingTimeoutMs: 45000
+
+  # -- Logging: Sets the log level for general logging.
+  logLevel: WARN
+
+  # -- Tracing: Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
+  tracing:
+    debugEnabled: false
+    jaegerCollectorBaseUrl: http://localhost:14268
+    samplerProbability: "1.0"
+
+  # -- Metrics - Victorialog: Controls the collection of metrics using Victorialog, specifying parameters like collector URL, clientId, batchsize, observationFlushInterval, countEventsInterval and samplingRate.
+  victorialog:
+    enabled: false
+    collectorUrl: http://localhost:8428
+    clientId: starlight
+    batchSize: 500
+    observationFlushInterval: 60000
+    countEventsInterval: 60000
+    samplingRate: 0.05
+
+  # -- JMX: Enables or disables JMX remote configuration.
+  jmxRemote:
+    enabled: false
+
+# -- Affinity: Configures settings related to affinity.
+affinity:
+  enabled: true
+
+# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
+rbac:
+  create: "true"
+  serviceAccountName:
+
+starlight:
+  # -- Features: Configure features such as publisherCheck, schemaValidation, and customPublishingTopics.
+  features:
+    publisherCheck: true
+    schemaValidation: true
+    customPublishingTopics: []
+
+  # -- OIDC: Configuration for authentication.
+  oidc:
+    issuerUrl: irisUrl
+    clientId: clientId
+    clientSecret: secret
+
+  # -- Eniapi: Configuration for internal eniapi including the base URL.
+  eniapi:
+    baseurl: localhost:9433
+
+# -- Ingress: Specifies whether ingress is enabled, sets the hostname, annotations, and indicates whether it is designed for CaaS (Container as a Service).
+ingress:
+  #tlsSecret: ""
+  enabled: false
+  hostname:
+  annotations: {}
+  isCaaS: false
+
+# -- Monitoring: ServiceMonitor configuration.
+monitoring:
+  serviceMonitor:
+    enabled: true
+    selector: selector
+
+# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- StartupProbe: Kubernetes Startup Probe configuration.
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 1
+  failureThreshold: 75
+
+# -- PodSecurityContext: Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1000
+  supplementalGroups: [1000]
+
+# -- ContainerSecurityContext: Security context set for the container.
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# -- Resources: Resource limits and requests.
+resources:
+  limits:
+    cpu: 1
+    memory: 500Mi
+  requests:
+    cpu: 50m
+    memory: 200Mi

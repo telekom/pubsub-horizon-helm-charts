@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels: {{ include "horizon.galaxy.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas | default 1 }}
+  selector: 
+    matchLabels: {{ include "horizon.galaxy.selector" $ | nindent 6 }}
+  template:
+    metadata:
+      labels: 
+      {{- include "horizon.galaxy.labels" $ | nindent 8 }}
+      annotations:
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+    spec:
+      {{- with .Values.common.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if eq (toString .Values.rbac.create) "true" }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName | default .Release.Name }}
+      {{- else }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName | default "default" }}
+      {{- end }}
+      containers:
+      - name: horizon-galaxy
+        image: {{ include "horizon.galaxy.image" $ }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext: {{- default .Values.containerSecurityContext | toYaml | nindent 10 }}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+       {{- if eq (toString .Values.commonHorizon.jmxRemote.enabled) "true" }}
+        - name: jmx
+          containerPort: 9010
+          protocol: TCP
+       {{- end }}
+        env: {{- include "horizon.galaxy.envs" $ | nindent 8 }}
+        resources: {{ .Values.resources | toYaml | nindent 10 }}
+        volumeMounts: {{- include "horizon.galaxy.volumeMounts" $ | nindent 8 }}
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: http
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: http
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: http
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds  }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+        {{- end }}
+        lifecycle:
+          preStop:
+            httpGet:
+              path: /actuator/shutdown
+              port: http
+              scheme: HTTP
+      securityContext: {{- default .Values.podSecurityContext | toYaml | nindent 8 }}
+      volumes: {{- include "horizon.galaxy.volumes" $ | nindent 6 }}
+      {{- if eq (toString .Values.affinity.enabled) "true" }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - namespaces:
+                - {{ .Release.Namespace }}
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - kafka
+                      - horizon-galaxy
+      {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

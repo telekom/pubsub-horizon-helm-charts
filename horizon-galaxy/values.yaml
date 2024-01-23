@@ -1,0 +1,167 @@
+# -- Deployment Configuration --
+
+# -- Image configuration for "galaxy" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+image:
+  repository: example.devops.company.de
+  organization: internal/example/horizon
+  name: galaxy
+  tag: develop
+  pullPolicy: IfNotPresent
+
+# -- Deployment replicas: Sets the number of replicas for the deployment.
+replicas: 1
+
+common:
+  # -- ImagePullSecrets: Defines image pull secrets for different clusters.
+  imagePullSecrets: []
+  cluster: cluster
+  team: horizon-pubsub
+  product: horizon
+  subProduct: galaxy
+  metadata:
+    environment: default
+  domain: example.domain.com
+
+commonHorizon:
+  # -- IssuerUrl: Sets the issuerUrl.
+  issuerUrl: issuerUrl
+
+  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, linger time, acknowledgment settings, and compression options.
+  kafka:
+    brokers: kafka:9092
+    lingerMs: 5
+    acks: 1
+    compression:
+      enabled: true
+      type: snappy
+
+  # -- Informer: Specifies namespace for the informer.
+  informer:
+    namespace: default
+
+  # -- Environment: Sets the default environment.
+  defaultEnvironment: default
+
+  # -- Logging: Sets the log level for general logging.
+  logLevel: WARN
+
+  # -- Tracing: Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
+  tracing:
+    debugEnabled: false
+    jaegerCollectorBaseUrl: http://localhost:14268
+    samplerProbability: "1.0"
+
+  # -- Metrics - Victorialog: Controls the collection of metrics using Victorialog, specifying parameters like collector URL, clientId, batchsize, observationFlushInterval, countEventsInterval and samplingRate.
+  victorialog:
+    enabled: false
+    collectorUrl: http://localhost:8428
+    clientId: galaxy
+    batchSize: 500
+    observationFlushInterval: 60000
+    countEventsInterval: 60000
+
+  # -- JMX: Enables or disables JMX remote configuration.
+  jmxRemote:
+    enabled: false
+
+# -- Affinity: Configures settings related to affinity.
+affinity:
+  enabled: true
+
+# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
+rbac:
+  create: "true"
+  serviceAccountName:
+
+galaxy:
+  # -- Kafka configuration for "galaxy" component: Specifies Kafka consumer settings for the "galaxy" component, such as consumingTopic, consumingGroupId and consumingPartitionCount.
+  kafka:
+    consumingTopic: published
+    consumingGroupId: galaxy
+    consumingPartitionCount: 16
+
+  # -- CoreThreadPoolSize: Specifies the core size of the thread pool.
+  coreThreadpoolSize: 5
+
+  # -- MaxThreadpoolSize: Specifies the maximum size of the thread pool.
+  maxThreadpoolSize: 100
+
+  # -- MaxTimeout:  Specifies the maximum timeout value in milliseconds for operations.
+  maxTimeout: 100000
+
+  # -- MaxRetries: Specifies the maximum number of retries allowed for operations.
+  maxRetries: 10
+
+  # -- Initial BackOffInterval: Specifies the initial backoff interval in milliseconds for retry operations.
+  initialBackoffInterval: 100
+
+  # -- MaxBackOffInterval: Specifies the maximum backoff interval in milliseconds for retry operations.
+  maxBackoffInterval: 30000
+
+  # -- BackoffMultiplier: Specifies the backoff multiplier used for exponential backoff in retry operations.
+  backoffMultiplier: 2.0
+
+  # -- ReseekInterval: Specifies the reseek interval in milliseconds.
+  reseekInterval: "3600000"
+
+  # -- Reprocessing: Configuration for reprocessing of messages.
+  reprocessing:
+    enabled: true
+    maxRetries: 10
+    maxUnbridgedMessageAgeMs: 180000
+    reprocessIntervalMs: 300000
+
+  # -- Cache configuration: Define cache service DNS.
+  cache:
+    serviceDns: cache
+
+# -- Monitoring: Service monitor configuration.
+monitoring:
+  serviceMonitor:
+    enabled: true
+    selector: selector
+
+# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- StartupProbe: Kubernetes Startup Probe configuration.
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 1
+  failureThreshold: 75
+
+# -- PodSecurityContext: Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1000
+  supplementalGroups: [1000]
+
+# -- ContainerSecurityContext: Security context set for the container.
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# -- Resources: Resource limits and requests.
+resources:
+  limits:
+    cpu: 1
+    memory: 500Mi
+  requests:
+    cpu: 50m
+    memory: 200Mi

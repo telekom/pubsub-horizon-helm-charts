@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+  {{- include "horizon.comet.labels" $ | nindent 4 }}
+  {{- include "common.statusmonitor.labels" $ | nindent 4 }}
+spec:
+  selector: {{ include "horizon.comet.selector" $ | nindent 4 }}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  # Setting clusterIP to None means no fixed Cluster-IP is assigned.
+  clusterIP: None

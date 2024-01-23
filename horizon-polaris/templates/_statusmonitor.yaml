@@ -1,0 +1,6 @@
+{{- define "status-monitor.labels" -}}
+developer.telekom.de/cluster: {{ .Values.common.cluster | default "default" | quote }}
+developer.telekom.de/product: {{ .Values.common.product | default .Chart.Name | quote }}
+developer.telekom.de/subproduct: {{ .Values.common.subProduct | default .Release.Name | quote }}
+developer.telekom.de/team: {{ .Values.common.team | default "default" | quote }}
+{{- end -}}

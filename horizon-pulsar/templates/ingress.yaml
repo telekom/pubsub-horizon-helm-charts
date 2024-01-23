@@ -1,0 +1,23 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  labels: {{ include "horizon.pulsar.labels" $ | nindent 4 }}
+  annotations: {{ include "horizon.ingress.labels" $ | nindent 4 }}
+spec:
+  rules:
+  - host: {{ include "horizon.pulsar.host" . }}
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Release.Name }}
+              port: 
+                name: http
+  tls:
+  - hosts:
+    - {{ include "horizon.pulsar.host" . }}
+  {{- end }}

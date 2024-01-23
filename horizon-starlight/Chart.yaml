@@ -1,0 +1,11 @@
+apiVersion: v1
+name: Horizon-Starlight
+description: Helm chart for Horizon's Starlight component
+version: 1.0.0
+home: https://github.com/telekom/pubsub-horizon
+sources:
+- https://github.com/telekom/pubsub-horizon-starlight
+keywords:
+- pubsub
+- horizon
+- starlight

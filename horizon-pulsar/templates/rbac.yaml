@@ -1,0 +1,52 @@
+{{- if eq (toString .Values.rbac.create) "true" }}
+  {{ $name := .Values.rbac.serviceAccountName | default .Release.Name }}
+  {{ $roleKind := "Role" }}
+  {{ $roleBindingNamespace := .Release.Namespace }}
+
+  {{- if eq (toString .Values.commonHorizon.informer.namespace) "stage" }}
+    {{ $roleKind = "ClusterRole" }}
+    {{ $roleBindingNamespace = "stage" }}
+{{- end }}
+
+# --- Service Account Configuration ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}
+
+---
+
+# --- Role Configuration for RBAC ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ $roleKind }}
+metadata:
+  name: {{ $name }}
+rules:
+- apiGroups:
+  - subscriber.horizon.telekom.de
+  resources:
+  - subscriptions
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+
+---
+
+# --- Role Binding Configuration for RBAC ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $name }}
+  namespace: {{ $roleBindingNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: {{ $roleKind }}
+  name: {{ $name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
