@@ -1,0 +1,168 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# -- Deployment Configuration --
+
+# -- Image configuration for "comet" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+image:
+  repository: example.devops.company.de
+  organization: internal/example/horizon
+  name: comet
+  tag: develop
+  pullPolicy: IfNotPresent
+
+# -- Deployment replicas: Sets the number of replicas for the deployment.
+replicas: 1
+
+common:
+  # -- ImagePullSecrets: Defines image pull secrets for different clusters.
+  imagePullSecrets: []
+  cluster: cluster
+  team: horizon-pubsub
+  product: horizon
+  subProduct: comet
+  metadata:
+    environment: default
+  domain: example.domain.com
+
+commonHorizon:
+  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, linger time, acknowledgment settings, and compression options.
+  kafka:
+    brokers: kafka:9092
+    lingerMs: 5
+    acks: 1
+    compression:
+      enabled: true
+      type: snappy
+
+  # -- Informer: Specifies namespace for the informer.
+  informer:
+    namespace: default
+
+  # -- Environment: Sets the default environment.
+  defaultEnvironment: default
+
+  # -- Logging: Sets the log level for general logging.
+  logLevel: WARN
+
+  # -- Logging: Sets the log level for Horizon specific logging.
+  horizonLogLevel: WARN
+
+  # -- Tracing: Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
+  tracing:
+    debugEnabled: false
+    jaegerCollectorBaseUrl: http://localhost:14268
+    samplerProbability: "1.0"
+
+  # -- Metrics - Victorialog: Controls the collection of metrics using Victorialog, specifying parameters like collector URL, clientId, batchsize, observationFlushInterval and countEventsInterval.
+  victorialog:
+    enabled: false
+    collectorUrl: http://localhost:8428
+    clientId: comet
+    batchSize: 1000
+    observationFlushInterval: 60000
+    countEventsInterval: 60000
+
+  # -- JMX: Enables or disables JMX remote configuration.
+  jmxRemote:
+    enabled: false
+
+# -- Affinity: Configures settings related to affinity.
+affinity:
+  enabled: true
+
+# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
+rbac:
+  create: "true"
+  serviceAccountName:
+
+comet:
+  # -- Kafka configuration for "comet" component: Specifies Kafka details for the "comet" component, such as consumingGroupId, consumingPartitionCount, consumerThreadPoolSize, consumerQueueCapacity and maxPollRecords.
+  kafka:
+    consumingGroupId: comet
+    consumingPartitionCount: 16
+    consumerThreadpoolSize: 4096
+    consumerQueueCapacity: 8192
+    maxPollRecords: 500
+
+  # -- Iris configuration: Authentication details for Iris, including the token endpoint, clientId, and client secret.
+  iris:
+    tokenEndpoint: irisUrl
+    clientId: clientId
+    clientSecret: secret
+
+  # -- Callback configuration: Configures parameters for callback handling, including timeouts, retries, backoff intervals, connection limits, and status codes for success and redelivery.
+  callback:
+    maxTimeout: 30000
+    maxRetries: 10
+    initialBackoffIntervalMs: 100
+    maxBackoffIntervalMs: 60000
+    backoffMultiplier: 2.0
+    maxConnections: 1000
+    successfulStatusCodes: 200,201,202,204
+    redeliveryStatusCodes: 401,429,502,503,504
+    redeliveryQueueCapacity: 2048
+    redeliveryThreadpoolSize: 16
+
+  # -- Security configuration: Set timeouts for secure token retrieval.
+  security:
+    retrieveTokenConnectTimeout: 5000
+    retrieveTokenReadTimeout: 5000
+
+  # -- Cache configuration: Define cache service DNS and enable data deduplication.
+  cache:
+    serviceDNS: app-cache-headless.integration.svc.cluster.local
+    deDuplication:
+      enabled: true
+
+# -- Monitoring: Service monitor configuration.
+monitoring:
+  serviceMonitor:
+    enabled: true
+    selector: selector
+
+# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 5
+
+# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 5
+
+# -- StartupProbe: Kubernetes Startup Probe configuration.
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 1
+  failureThreshold: 75
+
+# -- PodSecurityContext: Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1000
+  supplementalGroups: [1000]
+
+# -- ContainerSecurityContext: Security context set for the container.
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# -- Resources: Resource limits and requests.
+resources:
+  limits:
+    cpu: 4
+    memory: 4Gi
+  requests:
+    cpu: 50m
+    memory: 200Mi

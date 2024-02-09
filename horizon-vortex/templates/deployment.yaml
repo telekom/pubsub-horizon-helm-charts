@@ -1,0 +1,61 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels: {{ include "horizon.vortex.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas | default 1 }}
+  selector:
+    matchLabels: {{ include "horizon.vortex.selector" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "horizon.vortex.labels" $ | nindent 8 }}
+      {{- if .Values.metrics.enabled }}
+      annotations:
+        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: {{ .Values.metrics.enabled | quote }}
+        prometheus.io/port: {{ .Values.metrics.port | quote }}
+      {{- end }}
+    spec:
+      {{- with .Values.common.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: horizon-vortex
+          image: {{ include "horizon.vortex.image" $ }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext: {{- default .Values.containerSecurityContext | toYaml | nindent 12 }}
+          {{- if .Values.metrics.enabled }}
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          {{- end }}
+          env: {{- include "horizon.vortex.envs" $ | nindent 12 }}
+          resources: {{ .Values.resources | toYaml | nindent 12 }}
+      securityContext: {{- default .Values.podSecurityContext | toYaml | nindent 8 }}
+      volumes: {{- include "horizon.vortex.volumes" $ | nindent 6 }}
+      {{- if eq (toString .Values.affinity.enabled) "true" }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - namespaces:
+                - {{ .Release.Namespace }}
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - kafka
+                      - horizon-vortex
+      {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

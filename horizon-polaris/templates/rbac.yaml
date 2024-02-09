@@ -1,0 +1,61 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+{{- if eq (toString .Values.rbac.create) "true" }}
+  {{ $name := .Values.rbac.serviceAccountName | default .Release.Name }}
+  {{ $roleKind := "Role" }}
+  {{ $roleBindingKind := "RoleBinding" }}
+
+  {{- if eq (toString .Values.commonHorizon.informer.namespace) "stage" }}
+    {{ $roleKind = "ClusterRole" }}
+    {{ $roleBindingKind = "ClusterRoleBinding" }}
+{{- end }}
+
+# --- Service Account Configuration ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}
+
+---
+
+# --- Role Configuration for RBAC ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ $roleKind }}
+metadata:
+  name: {{ $name }}
+rules:
+  - apiGroups:
+      - subscriber.horizon.telekom.de
+    resources:
+      - subscriptions
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+
+---
+
+# --- Role Binding Configuration for RBAC ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ $roleBindingKind }}
+metadata:
+  name: {{ $name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: {{ $roleKind }}
+  name: {{ $name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $name }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

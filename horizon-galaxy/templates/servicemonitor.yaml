@@ -1,0 +1,30 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+{{- if eq (toString .Values.monitoring.serviceMonitor.enabled) "true" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}
+  labels: {{ include "horizon.galaxy.labels" $ | nindent 4 }}
+    release: {{ .Values.monitoring.serviceMonitor.selector }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels: {{ include "horizon.galaxy.selector" $ | nindent 6 }}
+  endpoints:
+    - port: http
+      path: "/actuator/prometheus"
+  targetLabels:
+    - developer.telekom.de/cluster
+    - developer.telekom.de/namespace
+    - developer.telekom.de/product
+    - developer.telekom.de/subproduct
+    - developer.telekom.de/team
+    - developer.telekom.de/environment
+    - app
+{{- end }}

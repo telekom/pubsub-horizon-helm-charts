@@ -1,0 +1,190 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# -- Deployment Configuration --
+
+# -- Image configuration for "polaris" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+image:
+  repository: example.devops.company.de
+  organization: internal/example/horizon
+  name: polaris
+  tag: develop
+  pullPolicy: IfNotPresent
+
+# -- Deployment replicas: Sets the number of replicas for the deployment.
+replicas: 1
+
+# -- Deployment strategy: Sets the deployment strategy for the deployment.
+strategy: {}
+
+common:
+  # -- ImagePullSecrets: Defines image pull secrets for different clusters.
+  imagePullSecrets: []
+  cluster: cluster
+  team: horizon-pubsub
+  product: horizon
+  subProduct: polaris
+  metadata:
+    environment: default
+  domain: example.domain.com
+
+commonHorizon:
+  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, groupId, linger time, acknowledgment settings, and compression options.
+  kafka:
+    brokers: kafka:9092
+    groupId: polaris
+    lingerMs: 5
+    acks: 1
+    compression:
+      enabled: true
+      type: snappy
+
+  # -- Informer: Specifies namespace for the informer.
+  informer:
+    namespace: default
+
+  # -- Environment: Sets the default environment.
+  defaultEnvironment: default
+
+  # -- Logging: Sets the log level for general logging.
+  logLevel: WARN
+
+  # -- Tracing: Configures tracing settings, including Jaeger collector base URL, and sampler probability.
+  tracing:
+    jaegerCollectorBaseUrl: http://localhost:14268
+    samplerProbability: "1.0"
+
+  # -- JMX: Enables or disables JMX remote configuration.
+  jmxRemote:
+    enabled: false
+
+# -- Affinity: Configures settings related to affinity.
+affinity:
+  enabled: true
+
+# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
+rbac:
+  create: "true"
+  serviceAccountName:
+
+polaris:
+  # -- Max connections: Maximum allowed connections.
+  maxConnections: 100
+
+  # -- Max timeout: Maximum timeout duration.
+  maxTimeout: 30000
+
+  # -- Iris configuration: Authentication details for Iris, including the token endpoint, clientId, and client secret.
+  iris:
+    tokenEndpoint: irisUrl
+    clientId: clientId
+    clientSecret: secret
+
+  # -- Informer namespace: Configuration for the informer, including default namespace.
+  informer:
+    pods:
+      namespace: default
+
+  # -- OffsetMins: Offset duration to adjust the time before considering states as delivered.
+  offsetMins:
+    deliveringStates: 15
+
+  # -- Polling: Configuration for polling mechanism.
+  polling:
+    intervalMs: 30000
+    batchSize: 10
+
+  # -- Picking: Timeout duration for the picking process.
+  picking:
+    timeoutMs: 5000
+
+  # -- Request: Configuration related to handling requests.
+  request:
+    cooldownResetMins: 90
+    scheduledThreadpool:
+      size: 50
+    delayMins: 5
+    successfulStatusCodes: 200,201,202,204
+
+  # -- Republish: Configuration for republishing mechanism.
+  republish:
+    threadpool:
+      maxSize: 50
+      coreSize: 50
+      queueCapacity: 50
+    batchSize: 100
+    timeoutMs: 5000
+
+  # -- Mongo configuration: Set clientId and mongo URL for mongo configuration.
+  mongo:
+    clientId: polaris
+    url: mongodbUrl
+
+  # -- SubscriptionCheck: Configuration related to subscription checking.
+  subscriptionCheck:
+    threadpool:
+      maxSize: 50
+      coreSize: 50
+      queueCapacity: 50
+
+  # -- Cache configuration: Define cache service DNS.
+  cache:
+    serviceDNS: cache
+
+# -- Ingress: Sets the hostname and annotations.
+ingress:
+  #tlsSecret: ""
+  hostname:
+  annotations: {}
+
+# -- Monitoring: Service monitor configuration.
+monitoring:
+  serviceMonitor:
+    enabled: true
+    selector: selector
+
+# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+readinessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+
+# -- StartupProbe: Kubernetes Startup Probe configuration.
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 1
+  failureThreshold: 75
+
+# -- PodSecurityContext: Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1000
+  supplementalGroups: [1000]
+
+# -- ContainerSecurityContext: Security context set for the container.
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# -- Resources: Resource limits and requests.
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 50m
+    memory: 200Mi
