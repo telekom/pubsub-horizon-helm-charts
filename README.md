@@ -1,3 +1,9 @@
+<!--
+Copyright 2024 Deutsche Telekom IT GmbH
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Horizon Helm Charts
 
 This repository contains all the Helm charts required to roll out Horizon.   

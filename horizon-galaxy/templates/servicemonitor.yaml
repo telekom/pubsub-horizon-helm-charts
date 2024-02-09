@@ -1,3 +1,7 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
 {{- if eq (toString .Values.monitoring.serviceMonitor.enabled) "true" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
