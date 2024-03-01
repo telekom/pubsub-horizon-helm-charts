@@ -1,13 +1,13 @@
 {{- define "horizon.starlight.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-starlight
 app.kubernetes.io/name: horizon-starlight
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
+app.kubernetes.io/instance: {{ .Release.Name }}-starlight-app
+app.kubernetes.io/component: starlight
+app.kubernetes.io/part-of: horizon
 {{- end -}}
 
 {{- define "horizon.starlight.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-starlight-app
 {{- end -}}
 
 {{- define "horizon.ingress.labels" -}}
@@ -120,12 +120,12 @@ nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 - name: CLIENT_ID
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-oidc
+      name: {{ .Release.Name }}-starlight-oidc
       key: clientId
 - name: CLIENT_SECRET
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-oidc
+      name: {{ .Release.Name }}-starlight-oidc
       key: clientSecret
 - name: ENIAPI_BASEURL
   value: {{ .Values.starlight.eniapi.baseurl | toString | quote }}

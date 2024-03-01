@@ -1,14 +1,14 @@
 {{- define "horizon.pulsar.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-pulsar
 app.kubernetes.io/name: horizon-pulsar
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
-eni.telekom.de/component: sse
+app.kubernetes.io/instance: {{ .Release.Name }}-pulsar-app
+app.kubernetes.io/component: pulsar
+app.kubernetes.io/part-of: horizon
+developer.telekom.de/pubsub/horizon/cache-context: sse
 {{- end -}}
 
 {{- define "horizon.pulsar.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-pulsar-app
 {{- end -}}
 
 {{- define "horizon.ingress.labels" -}}
@@ -132,7 +132,7 @@ nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 - name: {{ .Values.common.product | upper}}_MONGO_URL
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-mongo
+      name: {{ .Release.Name }}-pulsar-mongo
       key: mongoUrl
 - name: {{ .Values.image.name | upper }}_SECURITY_OAUTH
   value: {{ .Values.pulsar.oauthEnabled | default true | toString | quote }}

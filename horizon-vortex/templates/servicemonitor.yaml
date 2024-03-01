@@ -6,7 +6,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-vortex
   labels: {{ include "horizon.vortex.labels" $ | nindent 4 }}
     release: {{ .Values.metrics.release }}
   namespace: {{ .Release.Namespace }}

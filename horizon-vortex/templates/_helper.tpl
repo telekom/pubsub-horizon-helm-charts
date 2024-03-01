@@ -1,13 +1,13 @@
 {{- define "horizon.vortex.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-vortex
 app.kubernetes.io/name: horizon-vortex
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
+app.kubernetes.io/instance: {{ .Release.Name }}-vortex-app
+app.kubernetes.io/component: vortex
+app.kubernetes.io/part-of: horizon
 {{- end -}}
 
 {{- define "horizon.vortex.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-vortex-app
 {{- end -}}
 
 {{- define "horizon.vortex.volumes" -}}
@@ -49,7 +49,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}-app
 - name: {{ .Values.image.name | upper}}_MONGO_URL
   valueFrom:
     secretKeyRef:
-        name: {{ .Release.Name }}
+        name: {{ .Release.Name }}-vortex
         key: mongoUrl
 - name: {{ .Values.image.name | upper}}_MONGO_DATABASE
   value: {{ .Values.mongo.database | quote }}

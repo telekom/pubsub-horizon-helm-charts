@@ -1,14 +1,14 @@
 {{- define "horizon.polaris.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-polaris
 app.kubernetes.io/name: horizon-polaris
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
-eni.telekom.de/component: callback
+app.kubernetes.io/instance: {{ .Release.Name }}-polaris-app
+app.kubernetes.io/component: polaris
+app.kubernetes.io/part-of: horizon
+developer.telekom.de/pubsub/horizon/cache-context: callback
 {{- end -}}
 
 {{- define "horizon.polaris.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-polaris-app
 {{- end -}}
 
 {{- define "horizon.polaris.host" -}}
@@ -99,7 +99,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}-app
 - name: IRIS_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-iris
+      name: {{ .Release.Name }}-polaris-iris
       key: clientSecret
 - name: {{ .Values.image.name | upper }}_KAFKA_BROKERS
   value: {{ .Values.commonHorizon.kafka.brokers | quote }}
@@ -160,7 +160,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}-app
 - name: {{ .Values.common.product | upper}}_MONGO_URL
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-mongo
+      name: {{ .Release.Name }}-polaris-mongo
       key: mongoUrl
 - name: JAEGER_COLLECTOR_URL
   value: {{ .Values.commonHorizon.tracing.jaegerCollectorBaseUrl | quote }}

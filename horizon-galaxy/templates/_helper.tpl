@@ -1,13 +1,14 @@
 {{- define "horizon.galaxy.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-galaxy
 app.kubernetes.io/name: horizon-galaxy
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
+app.kubernetes.io/instance: {{ .Release.Name }}-galaxy-app
+app.kubernetes.io/component: galaxy
+app.kubernetes.io/part-of: horizon
+developer.telekom.de/pubsub/horizon/cache-context: galaxy
 {{- end -}}
 
 {{- define "horizon.galaxy.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-galaxy-app
 {{- end -}}
 
 {{- define "horizon.galaxy.volumes" -}}

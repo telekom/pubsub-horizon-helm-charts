@@ -6,7 +6,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-polaris
   labels: {{ include "horizon.polaris.labels" $ | nindent 4 }}
     release: {{ .Values.monitoring.serviceMonitor.selector }}
   namespace: {{ .Release.Namespace }}

@@ -1,14 +1,14 @@
 {{- define "horizon.comet.labels" -}}
-app: {{ .Release.Name }}
+app: {{ .Release.Name }}-comet
 app.kubernetes.io/name: horizon-comet
-app.kubernetes.io/instance: {{ .Release.Name }}-app
-app.kubernetes.io/component: app
-app.kubernetes.io/part-of: pubsub
-eni.telekom.de/component: callback
+app.kubernetes.io/instance: {{ .Release.Name }}-comet-app
+app.kubernetes.io/component: comet
+app.kubernetes.io/part-of: horizon
+developer.telekom.de/pubsub/horizon/cache-context: callback
 {{- end -}}
 
 {{- define "horizon.comet.selector" -}}
-app.kubernetes.io/instance: {{ .Release.Name }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}-comet-app
 {{- end -}}
 
 {{- define "horizon.comet.volumes" -}}
@@ -86,7 +86,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}-app
 - name: IRIS_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-iris
+      name: {{ .Release.Name }}-comet-iris
       key: clientSecret
 - name: {{ .Values.image.name | upper }}_KAFKA_BROKERS
   value: {{ .Values.commonHorizon.kafka.brokers | quote }}

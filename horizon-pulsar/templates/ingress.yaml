@@ -6,7 +6,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-pulsar
   labels: {{ include "horizon.pulsar.labels" $ | nindent 4 }}
   annotations: {{ include "horizon.ingress.labels" $ | nindent 4 }}
 spec:
@@ -18,7 +18,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ .Release.Name }}
+              name: {{ .Release.Name }}-pulsar
               port: 
                 name: http
   tls:

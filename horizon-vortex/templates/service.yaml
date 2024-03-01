@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-vortex
   labels: {{ include "horizon.vortex.labels" $ | nindent 4 }}
 spec:
   selector: {{ include "horizon.vortex.selector" $ | nindent 4 }}
