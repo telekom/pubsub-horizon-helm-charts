@@ -4,7 +4,7 @@ app.kubernetes.io/name: horizon-galaxy
 app.kubernetes.io/instance: {{ .Release.Name }}-galaxy-app
 app.kubernetes.io/component: galaxy
 app.kubernetes.io/part-of: horizon
-developer.telekom.de/pubsub/horizon/cache-context: galaxy
+developer.telekom.de/pubsub-horizon-cache-context: galaxy
 {{- end -}}
 
 {{- define "horizon.galaxy.selector" -}}

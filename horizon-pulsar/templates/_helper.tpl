@@ -4,7 +4,7 @@ app.kubernetes.io/name: horizon-pulsar
 app.kubernetes.io/instance: {{ .Release.Name }}-pulsar-app
 app.kubernetes.io/component: pulsar
 app.kubernetes.io/part-of: horizon
-developer.telekom.de/pubsub/horizon/cache-context: sse
+developer.telekom.de/pubsub-horizon-cache-context: sse
 {{- end -}}
 
 {{- define "horizon.pulsar.selector" -}}

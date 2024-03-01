@@ -16,7 +16,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ $name }}
+  name: {{ $name }}-comet
 
 ---
 
@@ -24,7 +24,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $roleKind }}
 metadata:
-  name: {{ $name }}
+  name: {{ $name }}-comet
 rules:
   - apiGroups:
       - subscriber.horizon.telekom.de
@@ -43,14 +43,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ $name }}
+  name: {{ $name }}-comet
   namespace: {{ $roleBindingNamespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: {{ $roleKind }}
-  name: {{ $name }}
+  name: {{ $name }}-comet
 subjects:
 - kind: ServiceAccount
-  name: {{ $name }}
+  name: {{ $name }}-comet
   namespace: {{ .Release.Namespace }}
 {{- end }}

@@ -4,7 +4,7 @@ app.kubernetes.io/name: horizon-comet
 app.kubernetes.io/instance: {{ .Release.Name }}-comet-app
 app.kubernetes.io/component: comet
 app.kubernetes.io/part-of: horizon
-developer.telekom.de/pubsub/horizon/cache-context: callback
+developer.telekom.de/pubsub-horizon-cache-context: callback
 {{- end -}}
 
 {{- define "horizon.comet.selector" -}}
