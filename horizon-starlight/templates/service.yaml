@@ -5,12 +5,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-starlight
+  name: {{ include "horizon.starlight.fullname" . }}
   labels: 
   {{- include "horizon.starlight.labels" $ | nindent 4 }}
-  {{- include "common.statusmonitor.labels" $ | nindent 4 }}
+  {{- if eq (toString .Values.monitoring.serviceMonitor.enabled) "true" }}
+  {{- with .Values.service.labels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
 spec:
-  selector: {{ include "horizon.starlight.selector" $ | nindent 4 }}
+  selector: {{ include "horizon.starlight.selectorLabels" $ | nindent 4 }}
   ports:
   - name: http
     port: 8080

@@ -2,29 +2,24 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-{{- if eq (toString .Values.rbac.create) "true" }}
-  {{ $name := .Values.rbac.serviceAccountName | default .Release.Name }}
-  {{ $roleKind := "Role" }}
-  {{ $roleBindingNamespace := .Release.Namespace }}
-
-  {{- if eq (toString .Values.commonHorizon.informer.namespace) "stage" }}
-    {{ $roleKind = "ClusterRole" }}
-    {{ $roleBindingNamespace = "stage" }}
+{{- if .Values.serviceAccount.create }}
+{{- $name := include "horizon.starlight.serviceAccountName" . }}
+{{- $roleKind := "Role" }}
+{{- $roleBindingNamespace := default .Release.Namespace .Values.commonHorizon.informer.namespace }}
+{{- if ne $roleBindingNamespace .Release.Namespace }}
+{{- $roleKind = "ClusterRole" }}
 {{- end }}
-
 # --- Service Account Configuration ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ $name }}-starlight
-
+  name: {{ $name }}
 ---
-
 # --- Role Configuration for RBAC ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $roleKind }}
 metadata:
-  name: {{ $name }}-starlight
+  name: {{ $name }}
 rules:
 - apiGroups:
   - subscriber.horizon.telekom.de
@@ -36,21 +31,19 @@ rules:
   - watch
   - update
   - patch
-
 ---
-
 # --- Role Binding Configuration for RBAC ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ $name }}-starlight
+  name: {{ $name }}
   namespace: {{ $roleBindingNamespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: {{ $roleKind }}
-  name: {{ $name }}-starlight
+  name: {{ $name }}
 subjects:
 - kind: ServiceAccount
-  name: {{ $name }}-starlight
+  name: {{ $name }}
   namespace: {{ .Release.Namespace }}
 {{- end }}
