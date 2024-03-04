@@ -4,78 +4,216 @@
 
 # -- Deployment Configuration --
 
-# -- Image configuration for "galaxy" deployment: Specifies the image details such as repository, organization, name, tag, and pull policy.
+
+
+# -- Sets the number of replicas for the deployment.
+replicaCount: 1
+
+# -- Specifies the image details such as repository, tag, and pull policy.
 image:
-  repository: example.devops.company.de
-  organization: internal/example/horizon
-  name: galaxy
-  tag: develop
+  repository: example.devops.company.de/internal/example/horizon/develop
   pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: develop
 
-# -- Deployment replicas: Sets the number of replicas for the deployment.
-replicas: 1
+# -- List of pull secrets that are required for pulling the the container images.
+imagePullSecrets: []
 
-common:
-  # -- ImagePullSecrets: Defines image pull secrets for different clusters.
-  imagePullSecrets: []
-  cluster: cluster
-  team: horizon-pubsub
-  product: horizon
-  subProduct: galaxy
-  metadata:
-    environment: default
-  domain: example.domain.com
+nameOverride: galaxy
+fullnameOverride: ""
+
+# -- RBAC (Role-Based Access Control) specific configuration.
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- Specifies the annotationsfor the pod.
+podAnnotations: {}
+# -- Specifies the labels for the pod.
+podLabels: {}
+
+# -- Security context set for the pod.
+podSecurityContext:
+  fsGroup: 1000
+  supplementalGroups: [1000]
+
+# -- Security context set for the container.
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# -- Specifies the service type and port as well as the labels for the service.
+service:
+  type: ClusterIP
+  port: http
+  labels:
+    developer.telekom.de/namespace: integration
+    developer.telekom.de/cluster: AWS-Integration
+    developer.telekom.de/product: horizon
+    developer.telekom.de/subproduct: galaxy
+    developer.telekom.de/team: pandora
+    developer.telekom.de/environment: integration
+    developer.telekom.de/expose-on-statuspage: 'true'
+
+# -- Specifies whether ingress is enabled, sets the hostname(s) and Ingress annotations.
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- Resource limits and requests.
+resources:
+  limits:
+    cpu: 1
+    memory: 500Mi
+  requests:
+    cpu: 50m
+    memory: 200Mi
+
+# -- Kubernetes Liveness Probe configuration.
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: actuator
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+# -- Kubernetes Readiness Probe configuration.
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: actuator
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 8
+# -- Kubernetes Startup Probe configuration.
+startupProbe:
+  httpGet:
+    path: /actuator/health
+    port: actuator
+  initialDelaySeconds: 0
+  periodSeconds: 1
+  failureThreshold: 75
+
+lifecycle:
+#  preStop:
+#    httpGet:
+#      path: /actuator/shutdown
+#      port: actuator
+#      scheme: HTTP
+
+# -- Horizontal Pod Autoscaler configuration.
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes:
+- name: tmp
+  emptyDir: {}
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+- mountPath: /tmp
+  name: tmp
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+# Node selector for pod assignment.
+nodeSelector: {}
+# Tolerations for pod assignment.
+tolerations: []
+# Affinity for pod assignment.
+affinity: {}
+
+# -- ServiceMonitor configuration.
+monitoring:
+  serviceMonitor:
+    enabled: true
+    selector: selector
+    targetLabels:
+      - developer.telekom.de/cluster
+      - developer.telekom.de/namespace
+      - developer.telekom.de/product
+      - developer.telekom.de/subproduct
+      - developer.telekom.de/team
+      - developer.telekom.de/environment
+      - app
+
+# -- Custom environment variables
+customEnv: {}
 
 commonHorizon:
-  # -- IssuerUrl: Sets the issuerUrl.
-  issuerUrl: issuerUrl
+  # -- Sets the issuerUrl that is used for authentication.
+  issuerUrl: https://keycloak.example.domain.com/auth/realms/example
 
-  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, linger time, acknowledgment settings, and compression options.
+  # -- Specifies Kafka broker details for common Horizon settings, including broker addresses, groupId, linger time, acknowledgment settings, and compression options.
   kafka:
     brokers: kafka:9092
+    groupId: galaxy
     lingerMs: 5
     acks: 1
     compression:
       enabled: true
       type: snappy
 
-  # -- Informer: Specifies namespace for the informer.
+  # -- Specifies namespace for the informer that watches the custom resources.
   informer:
     namespace: default
 
-  # -- Environment: Sets the default environment.
+  # -- Sets the default environment.
   defaultEnvironment: default
 
-  # -- Logging: Sets the log level for general logging.
+  # -- Sets the timeout duration (in milliseconds) for the publishing process.
+  publishingTimeoutMs: 45000
+
+  # -- Sets the log level for general logging.
   logLevel: WARN
 
-  # -- Tracing: Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
+  # -- Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
   tracing:
     debugEnabled: false
     jaegerCollectorBaseUrl: http://localhost:14268
     samplerProbability: "1.0"
 
-  # -- Metrics - Victorialog: Controls the collection of metrics using Victorialog, specifying parameters like collector URL, clientId, batchsize, observationFlushInterval, countEventsInterval and samplingRate.
-  victorialog:
-    enabled: false
-    collectorUrl: http://localhost:8428
-    clientId: galaxy
-    batchSize: 500
-    observationFlushInterval: 60000
-    countEventsInterval: 60000
-
-  # -- JMX: Enables or disables JMX remote configuration.
+  # -- Enables or disables JMX remote configuration.
   jmxRemote:
     enabled: false
-
-# -- Affinity: Configures settings related to affinity.
-affinity:
-  enabled: true
-
-# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
-rbac:
-  create: "true"
-  serviceAccountName:
 
 galaxy:
   # -- Kafka configuration for "galaxy" component: Specifies Kafka consumer settings for the "galaxy" component, such as consumingTopic, consumingGroupId and consumingPartitionCount.
@@ -118,54 +256,3 @@ galaxy:
   # -- Cache configuration: Define cache service DNS.
   cache:
     serviceDns: cache
-
-# -- Monitoring: Service monitor configuration.
-monitoring:
-  serviceMonitor:
-    enabled: true
-    selector: selector
-
-# -- LivenessProbe: Kubernetes Liveness Probe configuration.
-livenessProbe:
-  initialDelaySeconds: 20
-  periodSeconds: 10
-  failureThreshold: 8
-
-# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
-readinessProbe:
-  initialDelaySeconds: 20
-  periodSeconds: 10
-  failureThreshold: 8
-
-# -- StartupProbe: Kubernetes Startup Probe configuration.
-startupProbe:
-  enabled: false
-  initialDelaySeconds: 0
-  periodSeconds: 1
-  failureThreshold: 75
-
-# -- PodSecurityContext: Security context set for the pod.
-podSecurityContext:
-  fsGroup: 1000
-  supplementalGroups: [1000]
-
-# -- ContainerSecurityContext: Security context set for the container.
-containerSecurityContext:
-  readOnlyRootFilesystem: true
-  allowPrivilegeEscalation: false
-  privileged: false
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  capabilities:
-    drop:
-    - ALL
-
-# -- Resources: Resource limits and requests.
-resources:
-  limits:
-    cpu: 1
-    memory: 500Mi
-  requests:
-    cpu: 50m
-    memory: 200Mi

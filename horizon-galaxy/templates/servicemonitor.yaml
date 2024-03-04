@@ -6,7 +6,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}-galaxy
+  name: {{ include "horizon.galaxy.fullname" . }}
   labels: {{ include "horizon.galaxy.labels" $ | nindent 4 }}
     release: {{ .Values.monitoring.serviceMonitor.selector }}
   namespace: {{ .Release.Namespace }}
@@ -15,16 +15,12 @@ spec:
     matchNames:
       - {{ .Release.Namespace }}
   selector:
-    matchLabels: {{ include "horizon.galaxy.selector" $ | nindent 6 }}
+    matchLabels: {{ include "horizon.galaxy.selectorLabels" $ | nindent 6 }}
   endpoints:
-    - port: http
+    - port: actuator
       path: "/actuator/prometheus"
   targetLabels:
-    - developer.telekom.de/cluster
-    - developer.telekom.de/namespace
-    - developer.telekom.de/product
-    - developer.telekom.de/subproduct
-    - developer.telekom.de/team
-    - developer.telekom.de/environment
-    - app
+  {{- with .Values.monitoring.serviceMonitor.targetLabels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
