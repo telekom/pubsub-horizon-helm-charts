@@ -4,8 +4,6 @@
 
 # -- Deployment Configuration --
 
-
-
 # -- Sets the number of replicas for the deployment.
 replicaCount: 1
 
