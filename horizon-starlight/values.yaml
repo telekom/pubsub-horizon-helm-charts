@@ -4,21 +4,23 @@
 
 # -- Deployment Configuration --
 
-# -- Deployment replicas: Sets the number of replicas for the deployment.
+# -- Sets the number of replicas for the deployment.
 replicaCount: 1
 
-# -- Image configuration for "starlight" deployment: Specifies the image details such as repository, tag, and pull policy.
+# -- Specifies the image details such as repository, tag, and pull policy.
 image:
   repository: example.devops.company.de/internal/example/horizon/develop
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: develop
 
+# -- List of pull secrets that are required for pulling the the container images.
 imagePullSecrets: []
+
 nameOverride: starlight
 fullnameOverride: ""
 
-# -- RBAC: Configures settings related to RBAC (Role-Based Access Control).
+# -- RBAC (Role-Based Access Control) specific configuration.
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -30,15 +32,17 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+# -- Specifies the annotationsfor the pod.
 podAnnotations: {}
+# -- Specifies the labels for the pod.
 podLabels: {}
 
-# -- PodSecurityContext: Security context set for the pod.
+# -- Security context set for the pod.
 podSecurityContext:
   fsGroup: 1000
   supplementalGroups: [1000]
 
-# -- SecurityContext: Security context set for the container.
+# -- Security context set for the container.
 securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
@@ -50,6 +54,7 @@ securityContext:
     drop:
     - ALL
 
+# -- Specifies the service type and port as well as the labels for the service.
 service:
   type: ClusterIP
   port: http
@@ -62,7 +67,7 @@ service:
     developer.telekom.de/environment: integration
     developer.telekom.de/expose-on-statuspage: 'true'
 
-# -- Ingress: Specifies whether ingress is enabled, sets the hostname(s) and annotations.
+# -- Specifies whether ingress is enabled, sets the hostname(s) and Ingress annotations.
 ingress:
   enabled: true
   className: ""
@@ -81,7 +86,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# -- Resources: Resource limits and requests.
+# -- Resource limits and requests.
 resources:
   limits:
     cpu: 1
@@ -90,7 +95,7 @@ resources:
     cpu: 50m
     memory: 200Mi
 
-# -- LivenessProbe: Kubernetes Liveness Probe configuration.
+# -- Kubernetes Liveness Probe configuration.
 livenessProbe:
   httpGet:
     path: /actuator/health
@@ -98,7 +103,7 @@ livenessProbe:
   initialDelaySeconds: 20
   periodSeconds: 10
   failureThreshold: 8
-# -- ReadinessProbe: Kubernetes Readiness Probe configuration.
+# -- Kubernetes Readiness Probe configuration.
 readinessProbe:
   httpGet:
     path: /actuator/health
@@ -106,7 +111,7 @@ readinessProbe:
   initialDelaySeconds: 20
   periodSeconds: 10
   failureThreshold: 8
-# -- StartupProbe: Kubernetes Startup Probe configuration.
+# -- Kubernetes Startup Probe configuration.
 startupProbe:
   httpGet:
     path: /actuator/health
@@ -122,6 +127,7 @@ lifecycle:
 #      port: actuator
 #      scheme: HTTP
 
+# -- Horizontal Pod Autoscaler configuration.
 autoscaling:
   enabled: false
   minReplicas: 2
@@ -146,13 +152,14 @@ volumeMounts:
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+# Node selector for pod assignment.
 nodeSelector: {}
-
+# Tolerations for pod assignment.
 tolerations: []
-
+# Affinity for pod assignment.
 affinity: {}
 
-# -- Monitoring: ServiceMonitor configuration.
+# -- ServiceMonitor configuration.
 monitoring:
   serviceMonitor:
     enabled: true
@@ -166,13 +173,14 @@ monitoring:
       - developer.telekom.de/environment
       - app
 
+# -- Custom environment variables
 customEnv: {}
 
 commonHorizon:
-  # -- IssuerUrl: Sets the issuerUrl.
+  # -- Sets the issuerUrl that is used for authentication.
   issuerUrl: https://keycloak.example.domain.com/auth/realms/example
 
-  # -- Kafka configuration: Specifies Kafka broker details for common Horizon settings, including broker addresses, groupId, linger time, acknowledgment settings, and compression options.
+  # -- Specifies Kafka broker details for common Horizon settings, including broker addresses, groupId, linger time, acknowledgment settings, and compression options.
   kafka:
     brokers: kafka:9092
     groupId: starlight
@@ -182,37 +190,37 @@ commonHorizon:
       enabled: true
       type: snappy
 
-  # -- Informer: Specifies namespace for the informer.
+  # -- Specifies namespace for the informer that watches the custom resources.
   informer:
     namespace: default
 
-  # -- Environment: Sets the default environment.
+  # -- Sets the default environment.
   defaultEnvironment: default
 
-  # -- Publishing timeout: Sets the timeout duration (in milliseconds) for the publishing process.
+  # -- Sets the timeout duration (in milliseconds) for the publishing process.
   publishingTimeoutMs: 45000
 
-  # -- Logging: Sets the log level for general logging.
+  # -- Sets the log level for general logging.
   logLevel: WARN
 
-  # -- Tracing: Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
+  # -- Configures tracing settings, including debug mode, Jaeger collector base URL, and sampler probability.
   tracing:
     debugEnabled: false
     jaegerCollectorBaseUrl: http://localhost:14268
     samplerProbability: "1.0"
 
-  # -- JMX: Enables or disables JMX remote configuration.
+  # -- Enables or disables JMX remote configuration.
   jmxRemote:
     enabled: false
 
 starlight:
-  # -- Features: Configure features such as publisherCheck, schemaValidation, and customPublishingTopics.
+  # -- Configure Starlight features such as publisherCheck, schemaValidation, and customPublishingTopics.
   features:
     publisherCheck: true
     schemaValidation: false
     customPublishingTopics: []
 
-  # -- Eniapi: Configuration for communication with ENI API. Only used for schema validation feature, which is not available yet in the open source release of Horizon - can be ignored for Horizon OSS.
+  # -- Configuration for communication with the ENI API. Only used for schema validation feature, which is not available yet in the open source release of Horizon - can be ignored for Horizon OSS.
   eniapi:
     baseurl: https://eniapi.example.domain.com/api/v1
     auth:
