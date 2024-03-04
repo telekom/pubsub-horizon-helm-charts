@@ -1,14 +1,9 @@
 {{- define "horizon.galaxy.envs" -}}
-{{- $envPrefix := upper (include "horizon.galaxy.name" $) -}}
 {{- $customEnv := dict -}}
 {{- range $key, $val := .Values.customEnv }}
   {{- $upper := upper (printf "%v_%v" (include "horizon.galaxy.name" $) $key) -}}
   {{- $_ := set $customEnv $upper $val -}}
 {{- end -}}
-- name: SPRING_PROFILES_ACTIVE
-  value: "prod"
-- name: LOG_LEVEL
-  value: {{ .Values.commonHorizon.logLevel | quote }}
 - name: JAVA_TOOL_OPTIONS
 {{- if eq (toString .Values.commonHorizon.jmxRemote.enabled) "true" }}
   value: >-
@@ -40,54 +35,62 @@
     --add-opens=java.management/sun.management=ALL-UNNAMED
     --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
 {{- end }}
-- name: {{ $envPrefix }}_DEFAULT_ENVIRONMENT
-  value: {{ .Values.commonHorizon.defaultEnvironment | quote }}
-- name: {{ $envPrefix }}_KAFKA_BROKERS
-  value: {{ .Values.commonHorizon.kafka.brokers | quote }}
-- name: {{ $envPrefix }}_KAFKA_CONSUMING_TOPIC
-  value: {{ .Values.galaxy.kafka.consumingTopic | quote }}
-- name: {{ $envPrefix }}_KAFKA_GROUP_ID
-  value: {{ .Values.galaxy.kafka.consumingGroupId | quote }}
-- name: {{ $envPrefix }}_KAFKA_PARTITION_COUNT
-  value: {{ .Values.galaxy.kafka.consumingPartitionCount | quote }}
-- name: {{ $envPrefix }}_KAFKA_ACKS
-  value: {{ .Values.commonHorizon.kafka.acks | default 1 | quote }}
-- name: {{ $envPrefix }}_KAFKA_LINGER_MS
-  value: {{ .Values.commonHorizon.kafka.lingerMs | default 5 | quote }}
-- name: {{ $envPrefix }}_KAFKA_COMPRESSION_ENABLED
-  value: {{ .Values.commonHorizon.kafka.compression.enabled | default false | quote }}
-- name: {{ $envPrefix }}_KAFKA_COMPRESSION_TYPE
-  value: {{ .Values.commonHorizon.kafka.compression.type | default "snappy" }}
-- name: {{ $envPrefix }}_CORE_THREADPOOL_SIZE
-  value: {{ .Values.galaxy.coreThreadpoolSize | quote }}
-- name: {{ $envPrefix }}_MAX_THREADPOOL_SIZE
-  value: {{ .Values.galaxy.maxThreadpoolSize | quote }}
-- name: {{ $envPrefix }}_MAX_TIMEOUT
-  value: {{ .Values.galaxy.maxTimeout | quote }}
-- name: {{ $envPrefix }}_MAX_RETRIES
-  value: {{ .Values.galaxy.maxRetries | quote }}
-- name: {{ $envPrefix }}_INITIAL_BACKOFF_INTERVAL
-  value: {{ .Values.galaxy.initialBackoffInterval | quote }}
-- name: {{ $envPrefix }}_MAX_BACKOFF_INTERVAL
-  value: {{ .Values.galaxy.maxBackoffInterval | quote }}
-- name: {{ $envPrefix }}_BACKOFF_MULTIPLIER
-  value: {{ .Values.galaxy.backoffMultiplier | quote }}
-- name: {{ $envPrefix }}_REPROCESSING_ENABLED
-  value: {{ .Values.galaxy.reprocessing.enabled | quote }}
-- name: {{ $envPrefix }}_MAX_REPROCESS_RETRIES
-  value: {{ .Values.galaxy.reprocessing.maxRetries| quote }}
-- name: {{ $envPrefix }}_MAX_UNBRIDGED_MESSAGE_AGE
-  value: {{ .Values.galaxy.reprocessing.maxUnbridgedMessageAgeMs | quote }}
-- name: {{ $envPrefix }}_REPROCESS_INTERVAL
-  value: {{ .Values.galaxy.reprocessing.reprocessIntervalMs | quote }}
-- name: {{ $envPrefix }}_CACHE_SERVICE_DNS
-  value: {{ .Values.galaxy.cache.serviceDns }}
-- name: {{ $envPrefix }}_INFORMER_NAMESPACE
-  value: {{ .Values.commonHorizon.informer.namespace | quote }}
+- name: SPRING_PROFILES_ACTIVE
+  value: "prod"
+- name: LOG_LEVEL
+  value: {{ .Values.commonHorizon.logLevel | quote }}
 - name: JAEGER_COLLECTOR_URL
   value: {{ .Values.commonHorizon.tracing.jaegerCollectorBaseUrl | quote }}
 - name: ZIPKIN_SAMPLER_PROBABILITY
-  value: {{ .Values.commonHorizon.tracing.samplerProbability | quote }}  
+  value: {{ .Values.commonHorizon.tracing.samplerProbability | quote }}
+- name: GALAXY_DEFAULT_ENVIRONMENT
+  value: {{ .Values.commonHorizon.defaultEnvironment | quote }}
+- name: GALAXY_KAFKA_BROKERS
+  value: {{ .Values.commonHorizon.kafka.brokers | quote }}
+- name: GALAXY_KAFKA_CONSUMING_TOPIC
+  value: {{ .Values.galaxy.kafka.consumingTopic | quote }}
+- name: GALAXY_KAFKA_GROUP_ID
+  value: {{ .Values.galaxy.kafka.consumingGroupId | quote }}
+- name: GALAXY_KAFKA_PARTITION_COUNT
+  value: {{ .Values.galaxy.kafka.consumingPartitionCount | quote }}
+- name: GALAXY_KAFKA_ACKS
+  value: {{ .Values.commonHorizon.kafka.acks | default 1 | quote }}
+- name: GALAXY_KAFKA_LINGER_MS
+  value: {{ .Values.commonHorizon.kafka.lingerMs | default 5 | quote }}
+- name: GALAXY_KAFKA_COMPRESSION_ENABLED
+  value: {{ .Values.commonHorizon.kafka.compression.enabled | default false | quote }}
+- name: GALAXY_KAFKA_COMPRESSION_TYPE
+  value: {{ .Values.commonHorizon.kafka.compression.type | default "snappy" }}
+- name: GALAXY_CORE_THREADPOOL_SIZE
+  value: {{ .Values.galaxy.coreThreadpoolSize | quote }}
+- name: GALAXY_MAX_THREADPOOL_SIZE
+  value: {{ .Values.galaxy.maxThreadpoolSize | quote }}
+- name: GALAXY_MAX_TIMEOUT
+  value: {{ .Values.galaxy.maxTimeout | quote }}
+- name: GALAXY_MAX_RETRIES
+  value: {{ .Values.galaxy.maxRetries | quote }}
+- name: GALAXY_INITIAL_BACKOFF_INTERVAL
+  value: {{ .Values.galaxy.initialBackoffInterval | quote }}
+- name: GALAXY_MAX_BACKOFF_INTERVAL
+  value: {{ .Values.galaxy.maxBackoffInterval | quote }}
+- name: GALAXY_BACKOFF_MULTIPLIER
+  value: {{ .Values.galaxy.backoffMultiplier | quote }}
+- name: GALAXY_REPROCESSING_ENABLED
+  value: {{ .Values.galaxy.reprocessing.enabled | quote }}
+- name: GALAXY_MAX_REPROCESS_RETRIES
+  value: {{ .Values.galaxy.reprocessing.maxRetries| quote }}
+- name: GALAXY_MAX_UNBRIDGED_MESSAGE_AGE
+  value: {{ .Values.galaxy.reprocessing.maxUnbridgedMessageAgeMs | quote }}
+- name: GALAXY_REPROCESS_INTERVAL
+  value: {{ .Values.galaxy.reprocessing.reprocessIntervalMs | quote }}
+- name: GALAXY_CACHE_SERVICE_DNS
+  value: {{ .Values.galaxy.cache.serviceDns }}
+- name: GALAXY_INFORMER_NAMESPACE
+  value: {{ .Values.commonHorizon.informer.namespace | quote }}
+- name: PANDORA_TRACING_DEBUG_ENABLED
+  value: {{ .Values.commonHorizon.tracing.debugEnabled | quote }}
+- name: PANDORA_TRACING_NAME
+  value: {{ include "horizon.galaxy.name" $ | quote }}
 {{- template "horizon.renderEnv" $customEnv -}}
 {{- end -}}
 

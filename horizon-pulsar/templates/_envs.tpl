@@ -53,39 +53,39 @@
     secretKeyRef:
       name: {{ include "horizon.pulsar.fullname" . }}
       key: mongoUrl
-- name: COMET_ISSUER_URL
+- name: PULSAR_ISSUER_URL
   value: {{ .Values.commonHorizon.issuerUrl | quote }}
-- name: COMET_DEFAULT_ENVIRONMENT
+- name: PULSAR_DEFAULT_ENVIRONMENT
   value: {{ .Values.commonHorizon.defaultEnvironment | quote }}
-- name: COMET_KAFKA_BROKERS
+- name: PULSAR_KAFKA_BROKERS
   value: {{ .Values.commonHorizon.kafka.brokers | quote }}
-- name: COMET_KAFKA_GROUP_ID
+- name: PULSAR_KAFKA_GROUP_ID
   value: {{ .Values.commonHorizon.kafka.groupId | quote }}
-- name: COMET_KAFKA_LINGER_MS
+- name: PULSAR_KAFKA_LINGER_MS
   value: {{ .Values.commonHorizon.kafka.lingerMs | default 5 | quote }}
-- name: COMET_KAFKA_COMPRESSION_ENABLED
+- name: PULSAR_KAFKA_COMPRESSION_ENABLED
   value: {{ .Values.commonHorizon.kafka.compression.enabled | default false | quote }}
-- name: COMET_KAFKA_COMPRESSION_TYPE
+- name: PULSAR_KAFKA_COMPRESSION_TYPE
   value: {{ .Values.commonHorizon.kafka.compression.type | default "snappy" }}
-- name: COMET_KAFKA_ACKS
+- name: PULSAR_KAFKA_ACKS
   value: {{ .Values.commonHorizon.kafka.acks | default 1 | quote }}
-- name: COMET_FEATURE_SUBSCRIBER_CHECK
+- name: PULSAR_FEATURE_SUBSCRIBER_CHECK
   value: {{ .Values.pulsar.features.subscriberCheck | quote }}
-- name: COMET_SSE_POLL_DELAY
+- name: PULSAR_SSE_POLL_DELAY
   value: {{ .Values.pulsar.ssePollDelay | quote }}
-- name: COMET_SSE_TIMEOUT
+- name: PULSAR_SSE_TIMEOUT
   value: {{ .Values.pulsar.sseTimeout | quote }}
-- name: COMET_SSE_BATCH_SIZE
+- name: PULSAR_SSE_BATCH_SIZE
   value: {{ .Values.pulsar.sseBatchSize | quote }}
-- name: COMET_THREADPOOL_SIZE
+- name: PULSAR_THREADPOOL_SIZE
   value: {{ .Values.pulsar.threadPoolSize | quote }}
-- name: COMET_QUEUE_CAPACITY
+- name: PULSAR_QUEUE_CAPACITY
   value: {{ .Values.pulsar.queueCapacity | quote }}
-- name: COMET_SECURITY_OAUTH
+- name: PULSAR_SECURITY_OAUTH
   value: {{ .Values.pulsar.oauthEnabled | default true | toString | quote }}
-- name: COMET_CACHE_DE_DUPLICATION_ENABLED
+- name: PULSAR_CACHE_DE_DUPLICATION_ENABLED
   value: {{ .Values.pulsar.cache.deDuplication.enabled | quote }}
-- name: COMET_INFORMER_NAMESPACE
+- name: PULSAR_INFORMER_NAMESPACE
   value: {{ .Values.commonHorizon.informer.namespace | quote }}
 - name: PANDORA_TRACING_DEBUG_ENABLED
   value: {{ .Values.commonHorizon.tracing.debugEnabled | quote }}
