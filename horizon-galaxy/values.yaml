@@ -9,7 +9,7 @@ replicaCount: 1
 
 # -- Specifies the image details such as repository, tag, and pull policy.
 image:
-  repository: example.devops.company.de/internal/example/horizon/develop
+  repository: registry.example.domain.com/horizon/galaxy
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: develop
