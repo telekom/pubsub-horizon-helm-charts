@@ -35,7 +35,8 @@ serviceAccount:
 # -- Specifies the annotationsfor the pod.
 podAnnotations: {}
 # -- Specifies the labels for the pod.
-podLabels: {}
+podLabels:
+  developer.telekom.de/pubsub-horizon-cache-context: galaxy
 
 # -- Security context set for the pod.
 podSecurityContext:
@@ -99,7 +100,7 @@ resources:
 livenessProbe:
   httpGet:
     path: /actuator/health
-    port: actuator
+    port: http
   initialDelaySeconds: 20
   periodSeconds: 10
   failureThreshold: 8
@@ -107,7 +108,7 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: /actuator/health
-    port: actuator
+    port: http
   initialDelaySeconds: 20
   periodSeconds: 10
   failureThreshold: 8
@@ -115,7 +116,7 @@ readinessProbe:
 startupProbe:
   httpGet:
     path: /actuator/health
-    port: actuator
+    port: http
   initialDelaySeconds: 0
   periodSeconds: 1
   failureThreshold: 75
@@ -124,7 +125,7 @@ lifecycle:
 #  preStop:
 #    httpGet:
 #      path: /actuator/shutdown
-#      port: actuator
+#      port: http
 #      scheme: HTTP
 
 # -- Horizontal Pod Autoscaler configuration.
