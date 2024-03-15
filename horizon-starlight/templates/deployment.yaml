@@ -72,6 +72,9 @@ spec:
           {{- end }}
           env: {{- include "horizon.starlight.envs" . | nindent 12 }}
       {{- with .Values.volumes }}
+      {{ if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- end }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
