@@ -1,0 +1,22 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+horizon-starlight:
+  enabled: true
+
+horizon-galaxy:
+  enabled: true
+
+horizon-comet:
+  enabled: true
+
+horizon-polaris:
+  enabled: true
+
+horizon-vortex:
+  enabled: true
+
+horizon-pulsar:
+  enabled: true
+

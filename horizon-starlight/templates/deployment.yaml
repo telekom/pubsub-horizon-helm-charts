@@ -5,96 +5,82 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
-  labels: {{ include "horizon.starlight.labels" $ | nindent 4 }}
+  name: {{ include "horizon.starlight.fullname" . }}
+  labels:
+    {{- include "horizon.starlight.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicas | default 1 }}
-  selector: 
-    matchLabels: {{ include "horizon.starlight.selector" $ | nindent 6 }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "horizon.starlight.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-      {{- include "horizon.starlight.labels" $ | nindent 8 }}
+      {{- with .Values.podAnnotations }}
       annotations:
-        prometheus.io/path: "/actuator/prometheus"
-        prometheus.io/scrape: 'true'
-        prometheus.io/port: '8081'
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "horizon.starlight.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      {{- with .Values.common.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if eq (toString .Values.rbac.create) "true" }}
-      serviceAccountName: {{ .Values.rbac.serviceAccountName | default .Release.Name }}
-      {{- else }}
-      serviceAccountName: {{ .Values.rbac.serviceAccountName | default "default" }}
-      {{- end }}
+      serviceAccountName: {{ include "horizon.starlight.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: horizon-starlight
-        image: {{ include "horizon.starlight.image" $ }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        securityContext: {{- default .Values.containerSecurityContext | toYaml | nindent 10 }}
-        ports:
-        - name: http
-          containerPort: 8080
-          protocol: TCP
-        - name: actuator
-          containerPort: 8081
-          protocol: TCP
-       {{- if eq (toString .Values.commonHorizon.jmxRemote.enabled) "true" }}
-        - name: jmx
-          containerPort: 9010
-          protocol: TCP
-       {{- end }}
-        env: {{- include "horizon.starlight.envs" $ | nindent 8 }}
-        resources: {{ .Values.resources | toYaml | nindent 10 }}
-        volumeMounts: {{- include "horizon.starlight.volumeMounts" $ | nindent 8 }}
-        livenessProbe:
-          httpGet:
-            path: /actuator/health
-            port: actuator
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-        readinessProbe:
-          httpGet:
-            path: /actuator/health
-            port: actuator
-          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-        {{- if .Values.startupProbe.enabled }}
-        startupProbe:
-          httpGet:
-              path: /actuator/health
-              port: actuator
-          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds  }}
-          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
-          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
-        {{- end }}
-        lifecycle:
-          preStop:
-            httpGet:
-              path: /actuator/shutdown
-              port: actuator
-              scheme: HTTP
-      securityContext: {{- default .Values.podSecurityContext | toYaml | nindent 8 }}
-      volumes: {{- include "horizon.starlight.volumes" $ | nindent 6 }}
-      {{- if eq (toString .Values.affinity.enabled) "true" }}
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - namespaces:
-              - {{ .Release.Namespace }}
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values:
-                      - kafka
-                      - horizon-starlight
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: actuator
+              containerPort: 8081
+              protocol: TCP
+            {{- if eq (toString .Values.commonHorizon.jmxRemote.enabled) "true" }}
+            - name: jmx
+              containerPort: 9010
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}    
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env: {{- include "horizon.starlight.envs" . | nindent 12 }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity: {{- include "horizon.starlight.affinity" . | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

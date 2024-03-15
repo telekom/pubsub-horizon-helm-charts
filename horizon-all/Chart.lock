@@ -1,0 +1,21 @@
+dependencies:
+- name: horizon-starlight
+  repository: file://../horizon-starlight
+  version: 1.0.0
+- name: horizon-galaxy
+  repository: file://../horizon-galaxy
+  version: 1.0.0
+- name: horizon-comet
+  repository: file://../horizon-comet
+  version: 1.0.0
+- name: horizon-polaris
+  repository: file://../horizon-polaris
+  version: 1.0.0
+- name: horizon-vortex
+  repository: file://../horizon-vortex
+  version: 1.0.0
+- name: horizon-pulsar
+  repository: file://../horizon-pulsar
+  version: 1.0.0
+digest: sha256:3d646fa576f0f130ec1e9987d3c378dcc7e71c57cd19ab536251277e658ba0e7
+generated: "2024-03-01T11:38:21.3305683+01:00"

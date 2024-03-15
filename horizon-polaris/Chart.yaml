@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
-name: Horizon-Polaris
+name: horizon-polaris
 description: Helm chart for Horizon's Polaris component
 version: 1.0.0
 home: https://github.com/telekom/pubsub-horizon

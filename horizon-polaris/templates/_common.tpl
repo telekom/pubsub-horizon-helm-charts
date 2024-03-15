@@ -1,10 +1,26 @@
-{{- define "common.statusmonitor.labels" -}}
-developer.telekom.de/cluster: {{ .Values.common.cluster | default "default" | quote }}
-developer.telekom.de/namespace: {{ .Release.Namespace | default "undefined" | quote }}
-developer.telekom.de/product: {{ .Values.common.product | default .Chart.Name | quote }}
-developer.telekom.de/subproduct: {{ .Values.common.subProduct | default .Release.Name | quote }}
-developer.telekom.de/team: {{ .Values.common.team | default "default" | quote }}
-developer.telekom.de/environment: {{ .Values.common.metadata.environment | default "default" | quote }}
-developer.telekom.de/expose-on-statuspage: 'true'
+{{/*
+Given a dictionary of variable=value pairs, render a container env block.
+Environment variables are sorted alphabetically
+*/}}
+{{- define "horizon.renderEnv" -}}
+{{- $dict := . -}}
+{{- range keys . | sortAlpha }}
+{{- $val := pluck . $dict | first -}}
+{{- $valueType := printf "%T" $val -}}
+{{ if eq $valueType "map[string]interface {}" }}
+- name: {{ . }}
+{{ toYaml $val | indent 2 -}}
+{{- else if eq $valueType "string" }}
+{{- if regexMatch "valueFrom" $val }}
+- name: {{ . }}
+{{ $val | indent 2 }}
+{{- else }}
+- name: {{ . }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- else }}
+- name: {{ . }}
+  value: {{ $val | quote }}
+{{- end }}
 {{- end -}}
-
+{{- end -}}

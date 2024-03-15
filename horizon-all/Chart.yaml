@@ -1,0 +1,38 @@
+# Copyright 2024 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v2
+name: horizon-all
+description: Parent Helm chart for installing all Horizon components at once
+type: application
+version: 1.0.0
+home: https://github.com/telekom/pubsub-horizon
+keywords:
+- pubsub
+- horizon
+dependencies:
+- name: horizon-starlight
+  version: "1.0.0"
+  repository: "file://../horizon-starlight"
+  condition: horizon-starlight.enabled
+- name: horizon-galaxy
+  version: "1.0.0"
+  repository: "file://../horizon-galaxy"
+  condition: horizon-galaxy.enabled
+- name: horizon-comet
+  version: "1.0.0"
+  repository: "file://../horizon-comet"
+  condition: horizon-comet.enabled
+- name: horizon-polaris
+  version: "1.0.0"
+  repository: "file://../horizon-polaris"
+  condition: horizon-polaris.enabled
+- name: horizon-vortex
+  version: "1.0.0"
+  repository: "file://../horizon-vortex"
+  condition: horizon-vortex.enabled
+- name: horizon-pulsar
+  version: "1.0.0"
+  repository: "file://../horizon-pulsar"
+  condition: horizon-pulsar.enabled

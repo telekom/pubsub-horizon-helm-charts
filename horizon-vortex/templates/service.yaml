@@ -2,19 +2,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-{{- if .Values.metrics.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
-  labels: {{ include "horizon.vortex.labels" $ | nindent 4 }}
+  name: {{ include "horizon.vortex.fullname" . }}
+  labels: 
+  {{- include "horizon.vortex.labels" $ | nindent 4 }}
+  {{- if eq (toString .Values.monitoring.serviceMonitor.enabled) "true" }}
+  {{- with .Values.service.labels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
 spec:
-  selector: {{ include "horizon.vortex.selector" $ | nindent 4 }}
+  selector: {{ include "horizon.vortex.selectorLabels" $ | nindent 4 }}
   ports:
-    - name: metrics
-      port: {{ .Values.metrics.port }}
-      targetPort: {{ .Values.metrics.port }}
-      protocol: TCP
-  # Setting clusterIP to None means no fixed Cluster-IP is assigned.
-  clusterIP: None
-{{- end }}
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP

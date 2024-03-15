@@ -2,23 +2,25 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-{{- if .Values.metrics.enabled }}
+{{- if eq (toString .Values.monitoring.serviceMonitor.enabled) "true" }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "horizon.vortex.fullname" . }}
   labels: {{ include "horizon.vortex.labels" $ | nindent 4 }}
-    release: {{ .Values.metrics.release }}
+    release: {{ .Values.monitoring.serviceMonitor.selector }}
   namespace: {{ .Release.Namespace }}
 spec:
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
   selector:
-    matchLabels: {{ include "horizon.vortex.selector" $ | nindent 6 }}
+    matchLabels: {{ include "horizon.vortex.selectorLabels" $ | nindent 6 }}
   endpoints:
-    - port: metrics
+    - port: http
       path: "/metrics"
   targetLabels:
-    - app
+  {{- with .Values.monitoring.serviceMonitor.targetLabels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
