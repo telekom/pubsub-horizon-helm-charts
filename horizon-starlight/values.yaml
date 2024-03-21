@@ -121,11 +121,9 @@ startupProbe:
   failureThreshold: 75
 
 lifecycle:
-#  preStop:
-#    httpGet:
-#      path: /actuator/shutdown
-#      port: actuator
-#      scheme: HTTP
+  #preStop:
+  #  exec:
+  #    command: ["sleep", "15"]
 
 # -- Horizontal Pod Autoscaler configuration.
 autoscaling:
@@ -172,6 +170,9 @@ monitoring:
       - developer.telekom.de/team
       - developer.telekom.de/environment
       - app
+
+# -- Termination grace period (in seconds) for the pod. We set a default value of 45 seconds because commonHorizon.publishingTimeoutMs is set to 45000 milliseconds.
+terminationGracePeriodSeconds: 45
 
 # -- Custom environment variables
 customEnv: {}
