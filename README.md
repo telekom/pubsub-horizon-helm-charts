@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 # Horizon Helm Charts
 
-This repository contains all the Helm charts required to roll out Horizon.   
+This repository contains all the Helm charts required to roll out Horizon. Please refer to [documentation of the entire system](https://github.com/telekom/pubsub-horizon) to get the full picture.
 
 ## Contents
 
