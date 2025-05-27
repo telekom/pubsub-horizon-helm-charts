@@ -2,10 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
-const charts = ['horizon-starlight', 'horizon-galaxy'];
+function getCharts(dir = './charts') {
+  return fs.readdirSync(dir).filter(name => {
+    const fullPath = path.join(dir, name, 'Chart.yaml');
+    return fs.existsSync(fullPath);
+  });
+}
 
 module.exports = {
   branches: ['main'],
@@ -14,12 +19,13 @@ module.exports = {
     '@semantic-release/release-notes-generator',
     '@semantic-release/changelog',
     ['@semantic-release/exec', {
-      prepareCmd: 'node scripts/update-all-chart-versions.js ${nextRelease.version}'
+      prepareCmd: 'node scripts/update-chart-versions.js ${nextRelease.version}'
     }],
     ['@semantic-release/git', {
-      assets: ['**/Chart.yaml', 'CHANGELOG.md'],
+      assets: ['charts/**/Chart.yaml', 'CHANGELOG.md'],
       message: 'chore(release): ${nextRelease.version} [skip ci]'
     }],
     '@semantic-release/github'
   ]
 };
+

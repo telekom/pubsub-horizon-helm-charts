@@ -1,3 +1,7 @@
+# Copyright 2025 Deutsche Telekom IT GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Publish Helm Charts
 
 on:
@@ -8,12 +12,6 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        chart:
-          - horizon-starlight
-          - horizon-galaxy
 
     steps:
       - name: Checkout repo
@@ -28,15 +26,7 @@ jobs:
 
       - name: Get current branch
         id: refs
-        run: |
-          branch="${GITHUB_REF#refs/heads/}"
-          echo "branch=$branch" >> $GITHUB_OUTPUT
-
-      - name: Read chart version
-        id: chart_version
-        run: |
-          version=$(grep '^version:' ./${{ matrix.chart }}/Chart.yaml | awk '{print $2}')
-          echo "version=$version" >> $GITHUB_OUTPUT
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
       - name: Run semantic-release on main
         if: steps.refs.outputs.branch == 'main'
@@ -46,25 +36,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set chart tag
-        id: chart_tag
+      - name: Discover charts
+        id: charts
         run: |
-          if [ "${{ steps.refs.outputs.branch }}" = "main" ]; then
-            tag="${{ steps.chart_version.outputs.version }}"
-          else
-            sanitized=$(echo "${{ steps.refs.outputs.branch }}" | tr '/_' '--')  # replace / and _ with hyphens
-            tag="${{ steps.chart_version.outputs.version }}-${sanitized}"
-          fi
-          echo "tag=$tag" >> $GITHUB_OUTPUT
+          charts=$(find charts -name Chart.yaml -exec dirname {} \; | sed 's|charts/||')
+          echo "charts=$charts" >> $GITHUB_OUTPUT
 
-      - name: Push chart to OCI
-        uses: appany/helm-oci-chart-releaser@v0.3.0
-        with:
-          name: ${{ matrix.chart }}
-          repository: ${{ github.repository_owner }}
-          tag: ${{ steps.chart_tag.outputs.tag }}
-          path: ${{ matrix.chart }}
-          registry: ghcr.io
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          update_dependencies: 'true'
+      - name: Push Helm charts to OCI
+        run: |
+          for chart in ${{ steps.charts.outputs.charts }}; do
+            chart_path="charts/$chart"
+            version=$(grep '^version:' "$chart_path/Chart.yaml" | awk '{print $2}')
+
+            if [ "${{ steps.refs.outputs.branch }}" = "main" ]; then
+              tag="$version"
+            else
+              sanitized=$(echo "${{ steps.refs.outputs.branch }}" | tr '/_' '-')
+              tag="${version}-${sanitized}"
+            fi
+
+            echo "Pushing chart $chart with tag $tag"
+            helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            helm dependency update "$chart_path"
+            helm package "$chart_path" --version "$tag"
+            helm push "$chart-$tag.tgz" oci://ghcr.io/${{ github.repository_owner }}
+          done
+
