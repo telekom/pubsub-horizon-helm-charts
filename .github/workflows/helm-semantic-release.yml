@@ -1,0 +1,72 @@
+name: Release Helm Charts
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        chart:
+          - horizon-starlight
+          - horizon-galaxy
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Get base and head branch
+        id: refs
+        run: |
+          echo "base=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+
+      # Only do semantic-release + chart push if PR merged into main
+      - name: Run semantic-release (main only)
+        if: steps.refs.outputs.base == 'main'
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 22
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Read updated chart version
+      - name: Read chart version
+        id: chart_version
+        run: |
+          version=$(grep '^version:' ./${{ matrix.chart }}/Chart.yaml | awk '{print $2}')
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Derive feature tag
+        if: steps.refs.outputs.base != 'main'
+        id: feature_tag
+        run: |
+          branch="${{ steps.refs.outputs.branch }}"
+          sanitized=$(echo "$branch" | tr '/' '_')
+          version=$(grep '^version:' ./${{ matrix.chart }}/Chart.yaml | awk '{print $2}')
+          tag="${version}_${sanitized}"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Push Helm Chart to OCI
+        uses: appany/helm-oci-chart-releaser@v0.3.0
+        with:
+          name: ${{ matrix.chart }}
+          repository: ${{ github.repository_owner }}
+          tag: ${{ steps.refs.outputs.base == 'main' && steps.chart_version.outputs.version || steps.feature_tag.outputs.tag }}
+          path: ${{ matrix.chart }}
+          registry: ghcr.io
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          update_dependencies: 'true'
