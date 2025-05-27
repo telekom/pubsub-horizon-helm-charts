@@ -52,8 +52,8 @@ jobs:
           if [ "${{ steps.refs.outputs.branch }}" = "main" ]; then
             tag="${{ steps.chart_version.outputs.version }}"
           else
-            sanitized=$(echo "${{ steps.refs.outputs.branch }}" | tr '/' '_')
-            tag="${{ steps.chart_version.outputs.version }}_${sanitized}"
+            sanitized=$(echo "${{ steps.refs.outputs.branch }}" | tr '/_' '--')  # replace / and _ with hyphens
+            tag="${{ steps.chart_version.outputs.version }}-${sanitized}"
           fi
           echo "tag=$tag" >> $GITHUB_OUTPUT
 
