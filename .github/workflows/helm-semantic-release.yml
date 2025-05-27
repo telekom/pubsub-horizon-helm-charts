@@ -40,11 +40,13 @@ jobs:
         id: charts
         run: |
           charts=$(find charts -name Chart.yaml -exec dirname {} \; | sed 's|charts/||')
-          echo "charts=$charts" >> $GITHUB_OUTPUT
+          json=$(printf '%s\n' $charts | jq -R . | jq -cs .)
+          echo "charts=$json" >> $GITHUB_OUTPUT
 
       - name: Push Helm charts to OCI
         run: |
-          for chart in ${{ steps.charts.outputs.charts }}; do
+          charts=$(echo '${{ steps.charts.outputs.charts }}' | jq -r '.[]')
+          for chart in $charts; do
             chart_path="charts/$chart"
             version=$(grep '^version:' "$chart_path/Chart.yaml" | awk '{print $2}')
 
