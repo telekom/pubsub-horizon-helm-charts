@@ -12,26 +12,26 @@ This repository contains all the Helm charts required to roll out Horizon. Pleas
 
 Please visit the corresponding README of the respective Helm chart for more information.
 
-* [horizon-comet](./horizon-comet/README.md)
-* [horizon-galaxy](./horizon-galaxy/README.md)
-* [horizon-polaris](./horizon-polaris/README.md)
-* [horizon-pulsar](./horizon-pulsar/README.md)
-* [horizon-starlight](./horizon-starlight/README.md)
-* [horizon-vortex](./horizon-vortex/README.md)
+* [horizon-comet](./charts/horizon-comet/README.md)
+* [horizon-galaxy](./charts/horizon-galaxy/README.md)
+* [horizon-polaris](./charts/horizon-polaris/README.md)
+* [horizon-pulsar](./charts/horizon-pulsar/README.md)
+* [horizon-starlight](./charts/horizon-starlight/README.md)
+* [horizon-vortex](./charts/horizon-vortex/README.md)
 
 ## Install Chart
 
 If you want to install a Helm Chart of a component, execute this command:
 
 ```shell
-helm install [RELEASE_NAME] .\<component name> -n <namespace>
+helm install -f <valuesfile> -n <namespace> [RELEASE_NAME] oci://ghcr.io/telekom/o28m-charts/<chartname> --version <chartversion> 
 ```
-*Replace `<component name>` with the name of the Horizon component, that you wish to install. For example: `horizon-starlight`. Also make sure to replace `<namespace>` with the correct target namespace on the cluster.* 
+*Replace `<chartname>` with the name of the Horizon component/Helm chart name, that you wish to install. For example: `horizon-starlight`. Also make sure to replace `<namespace>` with the correct target namespace on the cluster and provide a valid helm chart version, e.g. `1.0.0`.* 
 
 We also added a parent Helm chart `horizon-all` that can be used to install all Horizon components at once. The corresponding command would look something like this:
 
 ```shell
-helm install horizon .\horizon-all -n platform
+helm install -f my-values.yaml -n platform horizon oci://ghcr.io/telekom/o28m-charts/horizon-all
 ```
 
 > **Note:** Horizon is a complex software that consists of many different interdependent components. Operating components individually is not conducive to a functional Horizon installation.
