@@ -1,21 +1,18 @@
 dependencies:
 - name: horizon-starlight
-  repository: file://../horizon-starlight
-  version: 1.0.0
+  repository: oci://ghcr.io/telekom/o28m-charts
+  version: 1.0.0-ci-semantic-release
 - name: horizon-galaxy
-  repository: file://../horizon-galaxy
-  version: 1.0.0
+  repository: oci://ghcr.io/telekom/o28m-charts
+  version: 1.0.0-ci-semantic-release
 - name: horizon-comet
-  repository: file://../horizon-comet
-  version: 1.0.0
-- name: horizon-polaris
-  repository: file://../horizon-polaris
-  version: 1.0.0
+  repository: oci://ghcr.io/telekom/o28m-charts
+  version: 1.0.0-ci-semantic-release
 - name: horizon-vortex
-  repository: file://../horizon-vortex
-  version: 1.0.0
+  repository: oci://ghcr.io/telekom/o28m-charts
+  version: 1.0.0-ci-semantic-release
 - name: horizon-pulsar
-  repository: file://../horizon-pulsar
-  version: 1.0.0
-digest: sha256:3d646fa576f0f130ec1e9987d3c378dcc7e71c57cd19ab536251277e658ba0e7
-generated: "2024-03-01T11:38:21.3305683+01:00"
+  repository: oci://ghcr.io/telekom/o28m-charts
+  version: 1.0.0-ci-semantic-release
+digest: sha256:b775ed0b52ed400c9a1f08d7caf3d5e0f2f1d9bfeaf35e8289c96f8addf44125
+generated: "2025-05-28T17:36:27.4496983+02:00"
