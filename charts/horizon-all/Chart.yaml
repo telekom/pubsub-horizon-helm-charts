@@ -24,10 +24,10 @@ dependencies:
   version: "1.0.0-ci-semantic-release"
   repository:  "oci://ghcr.io/telekom/o28m-charts"
   condition: horizon-comet.enabled
-#- name: horizon-polaris
-#  version: "1.0.0-ci-semantic-release"
-#  repository:  "oci://ghcr.io/telekom/o28m-charts"
-#  condition: horizon-polaris.enabled
+- name: horizon-polaris
+  version: "1.0.0-ci-semantic-release"
+  repository:  "oci://ghcr.io/telekom/o28m-charts"
+  condition: horizon-polaris.enabled
 - name: horizon-vortex
   version: "1.0.0-ci-semantic-release"
   repository: "oci://ghcr.io/telekom/o28m-charts"
