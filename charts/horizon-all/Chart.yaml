@@ -14,25 +14,25 @@ keywords:
 dependencies:
 - name: horizon-starlight
   version: "1.0.0"
-  repository: "file://../horizon-starlight"
+  repository: "oci://ghcr.io/telekom/o28m-charts/horizon-starlight"
   condition: horizon-starlight.enabled
 - name: horizon-galaxy
   version: "1.0.0"
-  repository: "file://../horizon-galaxy"
+  repository:  "oci://ghcr.io/telekom/o28m-charts/horizon-galaxy"
   condition: horizon-galaxy.enabled
 - name: horizon-comet
   version: "1.0.0"
-  repository: "file://../horizon-comet"
+  repository:  "oci://ghcr.io/telekom/o28m-charts/horizon-comet"
   condition: horizon-comet.enabled
 - name: horizon-polaris
   version: "1.0.0"
-  repository: "file://../horizon-polaris"
+  repository:  "oci://ghcr.io/telekom/o28m-charts/horizon-polaris"
   condition: horizon-polaris.enabled
 - name: horizon-vortex
   version: "1.0.0"
-  repository: "file://../horizon-vortex"
+  repository: "oci://ghcr.io/telekom/o28m-charts/horizon-vortex"
   condition: horizon-vortex.enabled
 - name: horizon-pulsar
   version: "1.0.0"
-  repository: "file://../horizon-pulsar"
+  repository:  "oci://ghcr.io/telekom/o28m-charts/horizon-pulsar"
   condition: horizon-pulsar.enabled
