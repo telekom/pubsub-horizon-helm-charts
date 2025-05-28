@@ -48,6 +48,8 @@ jobs:
           charts=$(echo '${{ steps.charts.outputs.charts }}' | jq -r '.[]')
           for chart in $charts; do
             chart_path="charts/$chart"
+            chart_name=$(basename "$chart_path")
+            prefixed_name="pubsub-${chart_name}"
             version=$(grep '^version:' "$chart_path/Chart.yaml" | awk '{print $2}')
 
             if [ "${{ steps.refs.outputs.branch }}" = "main" ]; then
@@ -61,6 +63,6 @@ jobs:
             helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             helm dependency update "$chart_path"
             helm package "$chart_path" --version "$tag"
-            helm push "$chart-$tag.tgz" oci://ghcr.io/${{ github.repository_owner }}
+            helm push "$chart-$tag.tgz" oci://ghcr.io/${{ github.repository_owner }}/$prefixed_name
           done
 
