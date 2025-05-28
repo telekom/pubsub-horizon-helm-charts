@@ -61,6 +61,6 @@ jobs:
             helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             helm dependency update "$chart_path"
             helm package "$chart_path" --version "$tag"
-            helm push "$chart-$tag.tgz" oci://ghcr.io/${{ github.repository_owner }}/o28m/pubsub
+            helm push "$chart-$tag.tgz" oci://ghcr.io/${{ github.repository_owner }}/pubsub
           done
 
