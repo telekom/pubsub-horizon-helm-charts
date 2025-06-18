@@ -32,7 +32,6 @@ jobs:
         if: steps.refs.outputs.branch == 'main'
         uses: cycjimmy/semantic-release-action@v4
         with:
-          semantic_version: 22
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/exec
