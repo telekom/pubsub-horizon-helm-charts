@@ -19,7 +19,11 @@ module.exports = {
     '@semantic-release/release-notes-generator',
     '@semantic-release/changelog',
     ['@semantic-release/exec', {
-      prepareCmd: 'node scripts/update-all-chart-versions.js ${nextRelease.version}'
+      prepareCmd: `
+        node scripts/update-horizon-all-versions.js \${nextRelease.version} &&
+        node scripts/update-parent-chart-dependencies.js \${nextRelease.version} &&
+        node scripts/prepend-changelog-license.js
+      `
     }],
     ['@semantic-release/git', {
       assets: ['charts/**/Chart.yaml', 'CHANGELOG.md'],
