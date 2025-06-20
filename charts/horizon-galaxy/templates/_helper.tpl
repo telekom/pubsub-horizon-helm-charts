@@ -30,19 +30,24 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+
 {{/*
 Common labels
 */}}
 {{- define "horizon.galaxy.labels" -}}
-app: {{ include "horizon.galaxy.name" . }}
-helm.sh/chart: {{ include "horizon.galaxy.chart" . }}
-{{ include "horizon.galaxy.selectorLabels" . }}
+{{- $base := dict
+    "helm.sh/chart" (include "horizon.galaxy.chart" .)
+    "app.kubernetes.io/managed-by" .Release.Service
+}}
 {{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- $_ := set $base "app.kubernetes.io/version" .Chart.AppVersion }}
 {{- end }}
-app.kubernetes.io/component: galaxy
-app.kubernetes.io/part-of: horizon
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- $selectorLabels := include "horizon.galaxy.selectorLabels" . | fromYaml }}
+{{- $extra := .Values.extraLabels | default dict }}
+{{- $all := merge $base $selectorLabels $extra }}
+{{- range $key, $value := $all }}
+{{ $key }}: {{ $value | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -52,6 +57,7 @@ Selector labels
 app.kubernetes.io/name: {{ include "horizon.galaxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
 
 {{/*
 Create the name of the service account to use

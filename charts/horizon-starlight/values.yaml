@@ -20,6 +20,14 @@ imagePullSecrets: []
 nameOverride: starlight
 fullnameOverride: ""
 
+extraLabels:
+  app.kubernetes.io/component: event-producer
+  app.kubernetes.io/part-of: horizon-runtime
+  ei.telekom.de/product: horizon
+  ei.telekom.de/platform: o28m
+  ei.telekom.de/environment: integration
+  ei.telekom.de/zone: aws
+
 # -- RBAC (Role-Based Access Control) specific configuration.
 serviceAccount:
   # Specifies whether a service account should be created
@@ -59,13 +67,8 @@ service:
   type: ClusterIP
   port: http
   labels:
-    developer.telekom.de/namespace: integration
-    developer.telekom.de/cluster: AWS-Integration
-    developer.telekom.de/product: horizon
-    developer.telekom.de/subproduct: starlight
-    developer.telekom.de/team: pandora
-    developer.telekom.de/environment: integration
-    developer.telekom.de/expose-on-statuspage: 'true'
+    ei.telekom.de/product: horizon
+    ei.telekom.de/environment: integration
 
 # -- Specifies whether ingress is enabled, sets the hostname(s) and Ingress annotations.
 ingress:
@@ -163,13 +166,10 @@ monitoring:
     enabled: true
     selector: selector
     targetLabels:
-      - developer.telekom.de/cluster
-      - developer.telekom.de/namespace
-      - developer.telekom.de/product
-      - developer.telekom.de/subproduct
-      - developer.telekom.de/team
-      - developer.telekom.de/environment
-      - app
+      - app.kubernetes.io/instance
+      - ei.telekom.de/product
+      - ei.telekom.de/environment
+      - ei.telekom.de/zone
 
 # -- Termination grace period (in seconds) for the pod. We set a default value of 45 seconds because commonHorizon.publishingTimeoutMs is set to 45000 milliseconds.
 terminationGracePeriodSeconds: 45

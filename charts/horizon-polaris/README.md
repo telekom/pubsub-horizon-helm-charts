@@ -31,7 +31,7 @@ Helm chart for deploying Horizon's [Polaris](https://github.com/telekom/pubsub-h
 | ingress | object | `{"annotations":{"kubernetes.io/ingress.class":"nginx","kubernetes.io/tls-acme":"true","nginx.ingress.kubernetes.io/backend-protocol":"HTTP","nginx.ingress.kubernetes.io/force-ssl-redirect":"true"},"className":"","enabled":true,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"Prefix"}]}],"tls":[]}` | Specifies whether ingress is enabled, sets the hostname(s) and Ingress annotations. |
 | lifecycle | string | `nil` |  |
 | livenessProbe | object | `{"failureThreshold":8,"httpGet":{"path":"/actuator/health","port":"actuator"},"initialDelaySeconds":20,"periodSeconds":10}` | Kubernetes Liveness Probe configuration. |
-| monitoring | object | `{"serviceMonitor":{"enabled":true,"selector":"selector","targetLabels":["developer.telekom.de/cluster","developer.telekom.de/namespace","developer.telekom.de/product","developer.telekom.de/subproduct","developer.telekom.de/team","developer.telekom.de/environment","app"]}}` | ServiceMonitor configuration. |
+| monitoring | object | `{"serviceMonitor":{"enabled":true,"selector":"selector","targetLabels":["ei.telekom.de/cluster","ei.telekom.de/namespace","ei.telekom.de/product","ei.telekom.de/team","ei.telekom.de/environment","app"]}}` | ServiceMonitor configuration. |
 | nameOverride | string | `"polaris"` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` | Specifies the annotationsfor the pod. |
@@ -53,7 +53,7 @@ Helm chart for deploying Horizon's [Polaris](https://github.com/telekom/pubsub-h
 | replicaCount | int | `1` | Sets the number of replicas for the deployment. |
 | resources | object | `{"limits":{"cpu":1,"memory":"1Gi"},"requests":{"cpu":"50m","memory":"200Mi"}}` | Resource limits and requests. |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | Security context set for the container. |
-| service | object | `{"labels":{"developer.telekom.de/cluster":"AWS-Integration","developer.telekom.de/environment":"integration","developer.telekom.de/expose-on-statuspage":"true","developer.telekom.de/namespace":"integration","developer.telekom.de/product":"horizon","developer.telekom.de/subproduct":"polaris","developer.telekom.de/team":"pandora"},"port":"http","type":"ClusterIP"}` | Specifies the service type and port as well as the labels for the service. |
+| service | object | `{"labels":{"ei.telekom.de/cluster":"AWS-Integration","ei.telekom.de/environment":"integration","ei.telekom.de/product":"horizon","ei.telekom.de/team":"pandora"},"port":"http","type":"ClusterIP"}` | Specifies the service type and port as well as the labels for the service. |
 | serviceAccount | object | `{"annotations":{},"automount":true,"create":true,"name":""}` | RBAC (Role-Based Access Control) specific configuration. |
 | startupProbe | object | `{"failureThreshold":75,"httpGet":{"path":"/actuator/health","port":"actuator"},"initialDelaySeconds":0,"periodSeconds":1}` | Kubernetes Startup Probe configuration. |
 | strategy | object | `{}` | Sets the deployment strategy for the deployment. |

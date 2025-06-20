@@ -34,15 +34,19 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "horizon.comet.labels" -}}
-app: {{ include "horizon.comet.name" . }}
-helm.sh/chart: {{ include "horizon.comet.chart" . }}
-{{ include "horizon.comet.selectorLabels" . }}
+{{- $base := dict
+    "helm.sh/chart" (include "horizon.comet.chart" .)
+    "app.kubernetes.io/managed-by" .Release.Service
+}}
 {{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- $_ := set $base "app.kubernetes.io/version" .Chart.AppVersion }}
 {{- end }}
-app.kubernetes.io/component: comet
-app.kubernetes.io/part-of: horizon
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- $selectorLabels := include "horizon.comet.selectorLabels" . | fromYaml }}
+{{- $extra := .Values.extraLabels | default dict }}
+{{- $all := merge $base $selectorLabels $extra }}
+{{- range $key, $value := $all }}
+{{ $key }}: {{ $value | quote }}
+{{- end }}
 {{- end }}
 
 {{/*

@@ -34,15 +34,19 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "horizon.starlight.labels" -}}
-app: {{ include "horizon.starlight.name" . }}
-helm.sh/chart: {{ include "horizon.starlight.chart" . }}
-{{ include "horizon.starlight.selectorLabels" . }}
+{{- $base := dict
+    "helm.sh/chart" (include "horizon.starlight.chart" .)
+    "app.kubernetes.io/managed-by" .Release.Service
+}}
 {{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- $_ := set $base "app.kubernetes.io/version" .Chart.AppVersion }}
 {{- end }}
-app.kubernetes.io/component: starlight
-app.kubernetes.io/part-of: horizon
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- $selectorLabels := include "horizon.starlight.selectorLabels" . | fromYaml }}
+{{- $extra := .Values.extraLabels | default dict }}
+{{- $all := merge $base $selectorLabels $extra }}
+{{- range $key, $value := $all }}
+{{ $key }}: {{ $value | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
